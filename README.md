@@ -14,10 +14,14 @@
   - [x] setup
   - years solved: ~2022
   - Mastery: 0.25/5
-- C/CPP
+- CPP
   - [x] setup
   - years solved: ~2023
   - Mastery: 0.8/5
+- C
+  - [x] setup
+  - years solved: ~2025
+  - Mastery: -/5
 - Zig
   - [] setup
 - Lua

@@ -1,0 +1,4 @@
+solution.exe
+*.o
+*.lib
+*.a
