@@ -1,11 +1,15 @@
 # --- Environment Setup ---
 # Detecting OS to handle file deletion/slashes
 ifeq ($(OS),Windows_NT)
+		CC = clang
+		AR = llvm-ar
     RM = del /Q /F
     FIXPATH = $(subst /,\,$1)
     MKDIR = if not exist $(subst /,\,$1) mkdir $(subst /,\,$1)
     LIB_NAME = utils.lib
 else
+		CC = cc
+		AR = ar
     RM = rm -f
     FIXPATH = $1
     MKDIR = mkdir -p $1
@@ -13,9 +17,7 @@ else
 endif
 
 # --- Configuration ---
-CC = clang
-AR = llvm-ar
-CFLAGS = -Wall -Wextra -O2 -I./libutils/include
+CFLAGS = -std=c99 -Wall -Wextra -Werror -O2 -g -fsanitize=address -I./libutils/include
 LDFLAGS = -L./libutils -lutils
 
 # Paths
@@ -26,11 +28,11 @@ STATIC_LIB = $(LIB_DIR)/$(LIB_NAME)
 
 # Usage: make run YEAR=2024 DAY=01
 run: build
-	@echo --- Running Day $(DAY) ($(YEAR)) ---
+	 @echo --- Running Day $(YEAR)/$(DAY) ---
 	$(call FIXPATH,./$(YEAR)/$(DAY)/solution.exe)
 
 build: $(STATIC_LIB)
-	@echo --- Building Day $(DAY) ---
+	@echo --- Building Day $(YEAR)/$(DAY) ---
 	$(CC) $(CFLAGS) $(YEAR)/$(DAY)/main.c -o $(YEAR)/$(DAY)/solution.exe $(LDFLAGS)
 
 # Build the utility library

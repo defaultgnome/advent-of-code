@@ -1,4 +1,5 @@
-solution.exe
+# for both folder (mac) and file (win)
+solution.exe*
 *.o
 *.lib
 *.a
