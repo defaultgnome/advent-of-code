@@ -7,6 +7,7 @@
 #ifndef INCLUDE_DFGN_STD_H
 #define INCLUDE_DFGN_STD_H
 
+#include <signal.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -33,6 +34,15 @@ typedef size_t usize;
 typedef ptrdiff_t isize;
 
 typedef void *anyopaque;
+
+// Debug
+#if defined(_MSC_VER)
+#define TRAP() __debugbreak()
+#elif defined(__GNUC__) || defined(__clang__)
+#define TRAP() __builtin_trap()
+#else
+#define TRAP() raise(SIGTRAP) // Fallback
+#endif
 
 // Arena
 
@@ -63,19 +73,16 @@ typedef struct {
 #endif // INCLUDE_DFGN_STD_H
 
 // FIXME: remove this #define
-// #define DFGN_STD_IMPLEMENTAION
+// #define DFGN_STD_IMPLEMENTAION*/
 
 #ifdef DFGN_STD_IMPLEMENTAION
-
-#include <signal.h>
-#include <sys/signal.h>
 
 // TODO: create macro for DFGN_ARRAY_FUNCTIONS
 i32 ArrayI32_Get(ArrayI32 array, usize index) {
   if (index >= 0 && index < array.length) {
     return array.items[index];
   }
-  raise(SIGTRAP);
+  TRAP();
   return 0;
 }
 

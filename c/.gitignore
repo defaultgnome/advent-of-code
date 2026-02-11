@@ -1,5 +1,5 @@
 # for both folder (mac) and file (win)
-solution.exe*
+build/
 *.o
 *.lib
 *.a

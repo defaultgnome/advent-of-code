@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <string.h>
 #define DFGN_STD_IMPLEMENTAION
 #include "../../intern/dfgn_std.h"
 #include <stdio.h>

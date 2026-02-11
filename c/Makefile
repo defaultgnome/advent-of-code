@@ -1,32 +1,34 @@
-# --- Environment Setup ---
+# --- Configuration ---
+CFLAGS = -std=c99 -Wall -Wextra -Werror -O2 -g
 # Detecting OS to handle file deletion/slashes
 ifeq ($(OS),Windows_NT)
 		CC = clang
 		AR = llvm-ar
-    RM = del /Q /F
-    FIXPATH = $(subst /,\,$1)
-    MKDIR = if not exist $(subst /,\,$1) mkdir $(subst /,\,$1)
+		RM = del /Q /F
+		FIXPATH = $(subst /,\,$1)
+		MKDIR = if not exist "$(subst /,\,$1)" mkdir "$(subst /,\,$1)"
+		EXT = .exe
 else
 		CC = cc
 		AR = ar
-    RM = rm -f
-    FIXPATH = $1
-    MKDIR = mkdir -p $1
+		RM = rm -f
+		FIXPATH = $1
+		MKDIR = mkdir -p $1
+		EXT =
+		CFLAGS += -fsanitize=address
 endif
-
-# --- Configuration ---
-CFLAGS = -std=c99 -Wall -Wextra -Werror -O2 -g -fsanitize=address
 
 # Usage: make run YEAR=2024 DAY=01
 run: build
-	 @echo --- Running Day $(YEAR)/$(DAY) ---
-	$(call FIXPATH,./$(YEAR)/$(DAY)/solution.exe)
+	@echo --- Running Day $(YEAR)/$(DAY) ---
+	$(call FIXPATH,./$(YEAR)/$(DAY)/build/main$(EXT))
 
 build:
 	@echo --- Building Day $(YEAR)/$(DAY) ---
-	$(CC) $(CFLAGS) $(YEAR)/$(DAY)/main.c -o $(YEAR)/$(DAY)/solution.exe
+	@$(call MKDIR,$(YEAR)/$(DAY)/build)
+	$(CC) $(CFLAGS) $(YEAR)/$(DAY)/main.c -o $(YEAR)/$(DAY)/build/main$(EXT)
 
 # Cleanup
 clean:
-	$(RM) */*/solution.exe
+	$(RM) */*/build/main$(EXT)
 	@echo Cleaned files.
