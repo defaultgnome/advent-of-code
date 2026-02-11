@@ -17,7 +17,6 @@ typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
 typedef int64_t i64;
-typedef i32 bool32;
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -46,13 +45,31 @@ typedef void *anyopaque;
 // Rather than creating it by hand, it's easier to use
 // dfgn_CreateArenaWithCapacityAndMemory()
 typedef struct dfgn_Arena {
-  usize nextAllocation;
+  u8 *ptr;
   usize capacity;
   u8 *memory;
 } dfgn_Arena;
 
-dfgn_Arena dfgn_CreateArenaWithCapacityAndMemory(usize capacity,
-                                                 anyopaque memory);
+dfgn_Arena dfgn_Arena_Create(usize capacity);
+void dfgn_Arena_Reset(dfgn_Arena *arena);
+void dfgn_Arena_Free(dfgn_Arena *arena);
+usize dfgn_Arena_GetCapacityLeft(dfgn_Arena arena);
+
+#define DFGN_ARENA_ALLOCATE_DEFINE(typeName, postfix)                          \
+  typeName *dfgn_Arena_Allocate##postfix(dfgn_Arena *arena);
+
+#define DFGN_ARENA_ALLOCATE_IMPL(typeName, postfix)                            \
+  typeName *dfgn_Arena_Allocate##postfix(dfgn_Arena *arena) {                  \
+    if (dfgn_Arena_GetCapacityLeft(*arena) < sizeof(typeName)) {               \
+      TRAP();                                                                  \
+      return (typeName *)arena->ptr;                                           \
+    }                                                                          \
+    typeName *data = (typeName *)arena->ptr;                                   \
+    arena->ptr += sizeof(typeName);                                            \
+    return data;                                                               \
+  }
+
+DFGN_ARENA_ALLOCATE_DEFINE(i32, I32)
 
 //---Arrays
 
@@ -74,7 +91,7 @@ dfgn_Arena dfgn_CreateArenaWithCapacityAndMemory(usize capacity,
     return 0;                                                                  \
   }
 
-DFGN_ARRAY_DEFINE(i32, ArrayI32);
+DFGN_ARRAY_DEFINE(i32, dfgn_ArrayI32)
 
 //---Strings
 typedef struct dfgn_String {
