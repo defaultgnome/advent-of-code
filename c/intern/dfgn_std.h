@@ -1,8 +1,5 @@
 /*
  * === DefaultGnome's Standard Library ===
- * this is made STB-style, you should decalre the implementation
- * `DFGN_STD_IMPLEMENTAION` in ONLY ONE of the file you are including this file
- * in.
  */
 #ifndef INCLUDE_DFGN_STD_H
 #define INCLUDE_DFGN_STD_H
@@ -35,7 +32,7 @@ typedef ptrdiff_t isize;
 
 typedef void *anyopaque;
 
-// Debug
+//---Debug
 #if defined(_MSC_VER)
 #define TRAP() __debugbreak()
 #elif defined(__GNUC__) || defined(__clang__)
@@ -44,46 +41,48 @@ typedef void *anyopaque;
 #define TRAP() raise(SIGTRAP) // Fallback
 #endif
 
-// Arena
+//---Arena
 
-// Arrays
+// Rather than creating it by hand, it's easier to use
+// dfgn_CreateArenaWithCapacityAndMemory()
+typedef struct dfgn_Arena {
+  usize nextAllocation;
+  usize capacity;
+  u8 *memory;
+} dfgn_Arena;
+
+dfgn_Arena dfgn_CreateArenaWithCapacityAndMemory(usize capacity,
+                                                 anyopaque memory);
+
+//---Arrays
 
 #define DFGN_ARRAY_DEFINE(typeName, arrayName)                                 \
-  typedef struct {                                                             \
+  typedef struct arrayName {                                                   \
     typeName *items;                                                           \
     usize length;                                                              \
     usize capacity;                                                            \
-  } arrayName;
+  } arrayName;                                                                 \
+                                                                               \
+  typeName arrayName##_Get(arrayName array, usize index);
 
-// TODO: add DFGN_ prefix everywhere
+#define DFGN_ARRAY_IMPL(typeName, arrayName)                                   \
+  typeName arrayName##_Get(arrayName array, usize index) {                     \
+    if (index >= 0 && index < array.length) {                                  \
+      return array.items[index];                                               \
+    }                                                                          \
+    TRAP();                                                                    \
+    return 0;                                                                  \
+  }
+
 DFGN_ARRAY_DEFINE(i32, ArrayI32);
 
-// TODO: add this to DEFINE
-i32 ArrayI32_Get(ArrayI32 array, usize index);
-
-// Strings
-typedef struct {
+//---Strings
+typedef struct dfgn_String {
   char *chars;
   usize length;
-} String;
+} dfgn_String;
 
 #define DFGN__STRING_LENGTH(s) ((sizeof(s) / sizeof((s)[0])) - sizeof((s)[0]))
 #define DFGN_STRING(str) {.chars = str, .length = DFGN__STRING_LENGTH(str)}
 
 #endif // INCLUDE_DFGN_STD_H
-
-// FIXME: remove this #define
-// #define DFGN_STD_IMPLEMENTAION*/
-
-#ifdef DFGN_STD_IMPLEMENTAION
-
-// TODO: create macro for DFGN_ARRAY_FUNCTIONS
-i32 ArrayI32_Get(ArrayI32 array, usize index) {
-  if (index >= 0 && index < array.length) {
-    return array.items[index];
-  }
-  TRAP();
-  return 0;
-}
-
-#endif // DFGN_STD_IMPLEMENTAION

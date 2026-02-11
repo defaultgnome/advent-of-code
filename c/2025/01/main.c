@@ -1,7 +1,6 @@
-#include <stdlib.h>
-#define DFGN_STD_IMPLEMENTAION
-#include "../../intern/dfgn_std.h"
+#include "../../intern/dfgn_std.c"
 #include <stdio.h>
+#include <stdlib.h>
 
 int main() {
   ArrayI32 array = {
@@ -14,7 +13,7 @@ int main() {
   i32 result = ArrayI32_Get(array, 4);
   printf("this is the result %d\n", result);
 
-  String myStr = DFGN_STRING("hello world");
+  dfgn_String myStr = DFGN_STRING("hello world");
   printf("this is the string '%s'\n", myStr.chars);
 
   return 0;
