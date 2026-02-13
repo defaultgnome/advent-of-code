@@ -1,5 +1,5 @@
 # --- Configuration ---
-CFLAGS = -std=c99 -Wall -Wextra -Werror -O2 -g
+CFLAGS = -std=c99 -Wall -Wextra -Werror -O2 -g -Wno-deprecated-declarations
 # Detecting OS to handle file deletion/slashes
 ifeq ($(OS),Windows_NT)
 		CC = clang
