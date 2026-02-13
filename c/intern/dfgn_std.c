@@ -5,13 +5,13 @@
 #include "./dfgn_std.h"
 #include <stdlib.h>
 
-//---Arrays
+ //---Arrays
 DFGN_ARRAY_IMPL(i32, dfgn_ArrayI32);
 
 //---Arena
 dfgn_Arena dfgn_Arena_Create(usize capacity) {
   anyopaque memory = malloc(capacity);
-  dfgn_Arena arena = {.capacity = capacity, .memory = memory, .ptr = memory};
+  dfgn_Arena arena = { .capacity = capacity, .memory = memory, .ptr = memory };
   return arena;
 }
 
@@ -19,8 +19,19 @@ usize dfgn_Arena_GetCapacityLeft(dfgn_Arena arena) {
   return ((arena.memory + arena.capacity) - arena.ptr);
 }
 
-void dfgn_Arena_Reset(dfgn_Arena *arena) { arena->ptr = arena->memory; }
+anyopaque dfgn_Arena_Allocate(dfgn_Arena* arena, usize bytes) {
+  if (dfgn_Arena_GetCapacityLeft(*arena) < bytes)
+  {
+    TRAP();
+    return NULL;
+  }
+  anyopaque data = arena->ptr;
+  arena->ptr += bytes;
+  return data;
+}
 
-void dfgn_Arena_Free(dfgn_Arena *arena) { free(arena->memory); }
+void dfgn_Arena_Reset(dfgn_Arena* arena) { arena->ptr = arena->memory; }
 
-DFGN_ARENA_ALLOCATE_IMPL(i32, I32);
+void dfgn_Arena_Free(dfgn_Arena* arena) { free(arena->memory); }
+
+//---Files
